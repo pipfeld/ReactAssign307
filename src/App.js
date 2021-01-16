@@ -7,21 +7,37 @@ class App extends Component {
   state = {
       characters: [],
     }
+
+    makeDeleteCall(character){
+      return axios.delete('http://localhost:5000/users', {data:  character})
+        .then(function (response) {
+          console.log(response);
+          return (response);
+        })
+        .catch(function (error) {
+          console.log(error);
+          return false;
+        });
+      }
     
     removeCharacter = index => {
       const { characters } = this.state
-      
-      this.setState({
-        characters: characters.filter((character, i) => {
-          return i !== index
-        }),
-      })
+      let deleteUser = characters[index]
+      this.makeDeleteCall(deleteUser).then(callResult => {
+        if(callResult.status === 200){
+          this.setState({
+            characters: characters.filter((character, i) => {
+              return i !== index
+            }),
+          });
+        }
+      });  
     }
 
     handleSubmit = character => {
       this.makePostCall(character).then( callResult => {
          if (callResult.status === 201) {
-            this.setState({ characters: [...this.state.characters, character] });
+            this.setState({ characters: [...this.state.characters, callResult.data] });
          }
       });
     }
